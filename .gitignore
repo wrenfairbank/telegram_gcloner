@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# project specific
+/telegram_gcloner/config.ini
+/telegram_gcloner/logs
+/telegram_gcloner/gclone_config
+/telegram_gcloner/pickle_*
