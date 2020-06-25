@@ -37,7 +37,7 @@ $ pip install -r requirements.txt
 
 1. 运行`telegram_gcloner.py`。
 2. 向机器人上传包含SA的ZIP文件，并在信息标题填写`/sa`。
-2.1 手机用户可先上传ZIP文件，再回复该信息`/sa`。
+   - 手机用户可先上传ZIP文件，再回复该信息`/sa`。
 3. 向机器人发送`/folders`设定常用文件夹。
 4. 向机器人发送或转发带有Google Drive链接的信息，按提示操作。
 
