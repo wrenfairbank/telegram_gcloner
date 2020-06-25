@@ -1,6 +1,7 @@
 # telegram gcloner
 
 一个Telegram机器人，方便手动保存Google Drive资源。如果你有好的想法，欢迎PR。
+演示机器人：http://t.me/ahzhebot
 
 ## 使用方法
 
@@ -26,9 +27,9 @@ $ pip install -r requirements.txt
 修改对应的内容，包括：
 
 > path_to_gclone = gclone路径
-
+>
 > telegram_token = telegram机器人token
-
+>
 > user_ids = 你的telegram id
 
 ## 运行
