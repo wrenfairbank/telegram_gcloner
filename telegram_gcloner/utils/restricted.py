@@ -14,8 +14,8 @@ def restricted(func):
         user_id = update.effective_user.id
         ban_list = context.bot_data.get('ban', [])
         # access control. comment out one or the other as you wish.
-        # if user_id in ban_list or user_id not in config.USER_IDS:
-        if user_id in ban_list:
+        # if user_id in ban_list:
+        if user_id in ban_list or user_id not in config.USER_IDS:
             logger.info("Unauthorized access denied for {} {}.".format(update.effective_user.full_name, user_id))
             return
         return func(update, context, *args, **kwargs)
