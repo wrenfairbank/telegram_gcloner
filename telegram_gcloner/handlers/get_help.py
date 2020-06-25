@@ -24,7 +24,7 @@ def get_help(update, context):
               '/start - 没啥用（仅限私聊）\n' \
               '/folders - 设置收藏文件夹\n' \
               '/sa - 上传包含sa的ZIP文件夹，在标题写上/sa设置Service Account\n' \
-              '4999baoyue - 商业洽谈，请附上留言\n' \
+              '/4999baoyue - 商业洽谈，请附上留言\n' \
               '/help - 输出本帮助\n'
     message_sent = update.message.reply_text(message)
     if update.message.chat_id < 0:
