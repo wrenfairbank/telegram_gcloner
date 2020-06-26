@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import html
 import logging
 
 
@@ -20,14 +21,14 @@ def leave_chat_from_message(message, context):
         mention_html_from_user = mention_html(message.from_user.id,
                                               message.from_user.full_name.full_name)
         text = 'Left unauthorized group: {} ({}). {} {}. {}'.format(
-            message.chat.title,
+            html.escape(message.chat.title),
             message.chat_id,
             mention_html_from_user,
             message.from_user.id,
             message.text)
     else:
         text = 'Left unauthorized group: {} ({}). {}'.format(
-            message.chat.title,
+            html.escape(message.chat.title),
             message.chat_id,
             message.text)
     context.bot.leave_chat(message.chat_id)

@@ -109,7 +109,7 @@ def main():
                                         store_bot_data=True,
                                         store_user_data=True,
                                         store_chat_data=False)
-    q = mq.MessageQueue(all_burst_limit=3, all_time_limit_ms=3000)
+    q = mq.MessageQueue()
     request = TGRequest(con_pool_size=8)
     my_bot = MQBot(config.TELEGRAM_TOKEN, request=request, mqueue=q)
     updater = Updater(bot=my_bot, use_context=True, persistence=telegram_pickle)

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import datetime
+import html
 import logging
 import os
 import re
@@ -119,7 +120,7 @@ def fire_save_files(update, context, folder_ids, text, dest_folder):
                                    '任务进度：<code>[{}] {: >4}%</code>'\
                     .format(
                         folder_id,
-                        destination_path,
+                        html.escape(destination_path),
                         progress_checked_files,
                         progress_total_check_files,
                         progress_transferred_file,

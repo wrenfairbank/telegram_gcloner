@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import html
 import logging
 import math
 import re
@@ -31,7 +32,7 @@ def parse_folder_id_from_url(url):
 
 
 def alert_users(context, user_info, warning_message, text):
-    mention_html_user = mention_html(user_info.id, user_info.full_name)
+    mention_html_user = mention_html(user_info.id, html.escape(user_info.full_name))
     message = 'suspicious behaviour from user {} {}: {} {}.'.format(
         mention_html_user,
         user_info.id,

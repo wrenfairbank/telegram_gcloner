@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import copy
+import html
 import logging
 import re
 
@@ -24,7 +25,6 @@ udkey_fav_folders_replace = 'favourite_folder_ids_replace'
 
 def init(dispatcher: Dispatcher):
     """Provide handlers initialization."""
-    # dispatcher.add_handler(CommandHandler('folder', choose_folder, pass_args=True))
     dispatcher.add_handler(
         CallbackQueryHandler(choose_folder,
                              pattern=r'^(?:un)?choose_folder(?:_replace)?(?:_page#\d+)?(?:\,[\dA-Za-z\-_]+)?$'))
@@ -47,7 +47,8 @@ def chosen_folder(update, context):
         gd = GoogleDrive(update.effective_user.id)
     except Exception as e:
         context.bot.send_message(chat_id=update.effective_user.id,
-                                 text='请确认SA已正确上传，并配置收藏文件夹。\n<code>{}</code>'.format(e),
+                                 text='请确认SA已正确上传，并配置收藏文件夹。\n'
+                                      '<code>{}</code>'.format(html.escape(str(e))),
                                  parse_mode=ParseMode.HTML)
         return
 
@@ -92,7 +93,8 @@ def choose_folder(update, context):
         gd = GoogleDrive(update.effective_user.id)
     except Exception as e:
         context.bot.send_message(chat_id=update.effective_user.id,
-                                 text='请确认SA已正确上传，并配置收藏文件夹。\n<code>{}</code>'.format(e),
+                                 text='请确认SA已正确上传，并配置收藏文件夹。\n'
+                                      '<code>{}</code>'.format(html.escape(str(e))),
                                  parse_mode=ParseMode.HTML)
         return
 
@@ -105,7 +107,7 @@ def choose_folder(update, context):
             folders = gd.get_drives()
             current_folder_id = ''
             context.bot.send_message(chat_id=update.effective_user.id,
-                                     text='错误：\n<code>{}</code>'.format(e),
+                                     text='错误：\n<code>{}</code>'.format(html.escape(str(e))),
                                      parse_mode=ParseMode.HTML)
 
     callback_query_prefix = 'choose_folder'
@@ -142,7 +144,7 @@ def choose_folder(update, context):
                     folders = gd.get_drives()
                     current_folder_id = ''
                     context.bot.send_message(chat_id=update.effective_user.id,
-                                             text='错误：\n<code>{}</code>'.format(e),
+                                             text='错误：\n<code>{}</code>'.format(html.escape(str(e))),
                                              parse_mode=ParseMode.HTML)
                 context.user_data[udkey_folders_cache] = copy.deepcopy(folders)
                 if not folders:
@@ -201,7 +203,8 @@ def choose_folder(update, context):
             inline_keyboard_drive_ids.append(
                 [InlineKeyboardButton('选择本文件夹({})'.format(current_folder_name),
                                       callback_data='chosen_folder,{}'.format(current_folder_id))])
-    inline_keyboard_drive_ids.append([InlineKeyboardButton('返回顶层', callback_data='choose_folder'),
+    inline_keyboard_drive_ids.append([InlineKeyboardButton('返回顶层',
+                                                           callback_data='choose_folder' if current_folder_id else '#'),
                                       InlineKeyboardButton('取消', callback_data='cancel')])
     context.bot.edit_message_text(chat_id=update.effective_chat.id,
                                   message_id=message_id,

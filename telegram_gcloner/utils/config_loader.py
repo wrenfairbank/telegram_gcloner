@@ -17,8 +17,6 @@ class _Config:
         self._log_file = ''
         self._telegram_token = None
         self._path_to_gclone = None
-        self._key_string_folder_id = ''
-        self._key_string_message_id = ''
         self._user_ids = ''
         self._group_ids = ''
         self._base_path = os.path.dirname(os.path.dirname(__file__))

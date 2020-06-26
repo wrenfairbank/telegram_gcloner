@@ -50,12 +50,12 @@ class GoogleDrive:
                 drives = self.service.drives().list(**param).execute()
 
                 result.extend(drives['drives'])
-                logger.info('Received {} drives'.format(len(drives['drives'])))
+                logger.debug('Received {} drives'.format(len(drives['drives'])))
                 page_token = drives.get('nextPageToken')
                 if not page_token:
                     break
             except errors.HttpError as error:
-                logger.info('An error occurred: %s' % error)
+                logger.warning('An error occurred: %s' % error)
                 break
         drive_dict = {}
         for item in result:

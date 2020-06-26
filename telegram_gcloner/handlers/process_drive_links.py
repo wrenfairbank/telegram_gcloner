@@ -61,15 +61,12 @@ def parse_entity_for_drive_id(message):
 def process_drive_links(update, context):
     if not update.message:
         return
-    # if update.message.chat.id not in config.USER_IDS:
-    #     logger.debug('Ignore message from {0}.'.format(update.message.chat.id))
-    #     return
 
     folder_ids = parse_entity_for_drive_id(update.message)
 
     if not folder_ids:
         return
-    message = '检测到以下文件：'
+    message = '检测到以下文件：\n'
 
     try:
         gd = GoogleDrive(update.effective_user.id)

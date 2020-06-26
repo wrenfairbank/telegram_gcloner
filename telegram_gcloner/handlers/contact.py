@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import html
 import logging
 
 from telegram import ParseMode
@@ -22,7 +23,7 @@ def contact(update, context):
     if update.message.text.strip('/4999baoyue'):
         context.bot.send_message(chat_id=config.USER_IDS[0],
                                  text='Received message from {} ({}):'.format(
-                                     mention_html(update.effective_user.id, update.effective_user.name),
+                                     mention_html(update.effective_user.id, html.escape(update.effective_user.name)),
                                      update.effective_user.id),
                                  parse_mode=ParseMode.HTML)
         context.bot.forward_message(chat_id=config.USER_IDS[0],
