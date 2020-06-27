@@ -68,8 +68,6 @@ def process_message(update, context):
         pass
         # process_message_for_gclone(update, context)
     else:
-        update.message.forward(config.USER_IDS[0])
-
         logger.debug(update.message)
         if update.message.caption:
             text_urled = update.message.caption_html_urled
