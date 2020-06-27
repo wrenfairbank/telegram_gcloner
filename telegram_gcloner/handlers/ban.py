@@ -38,6 +38,10 @@ def ban(update: Update, context: CallbackContext):
     else:
         update.message.reply_text('已存在于黑名单。')
         return
+    tasks = context.dispatcher.user_data[user_id].get('tasks', None)
+    if tasks:
+        for t in tasks:
+            t.kill()
     update.message.reply_text('已添加至黑名单。')
     return
 

@@ -225,5 +225,12 @@ class MySaveFileThread(threading.Thread):
         update.callback_query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton(text='已完成', callback_data='cancel')]]))
 
+        tasks = context.user_data.get('tasks', None)
+        if tasks:
+            for t in tasks:
+                if t.ident == thread_id:
+                    context.user_data['tasks'].remove(t)
+                    return
+
     def kill(self):
         self.critical_fault = True
