@@ -3,12 +3,11 @@
 import html
 import logging
 import re
-import threading
 
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Dispatcher, CallbackQueryHandler
 
-from utils.fire_save_files import fire_save_files
+from utils.fire_save_files import MySaveFileThread
 from utils.google_drive import GoogleDrive
 from utils.helper import parse_folder_id_from_url, alert_users, get_inline_keyboard_pagination_data, simplified_path
 
@@ -100,7 +99,8 @@ def process_drive_links(update, context):
     else:
         inline_keyboard_drive_ids = [[InlineKeyboardButton(text='未收藏团队盘，先收藏才能操作。', callback_data='#')]]
     inline_keyboard = inline_keyboard_drive_ids
-    update.message.reply_text(message, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(inline_keyboard))
+    update.message.reply_text(message, parse_mode=ParseMode.HTML,
+                              disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(inline_keyboard))
 
 
 def save_to_folder_page(update, context):
@@ -151,7 +151,10 @@ def save_to_folder(update, context):
         return
     dest_folder = fav_folders[match.group(1)]
     dest_folder['folder_id'] = match.group(1)
-    t = threading.Thread(target=fire_save_files, args=(update, context, folder_ids, text, dest_folder))
+    if not context.user_data.get('tasks', None):
+        context.user_data['tasks'] = []
+    t = MySaveFileThread(args=(update, context, folder_ids, text, dest_folder))
+    context.user_data['tasks'].append(t)
     t.start()
     query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
         [[InlineKeyboardButton(text='已执行', callback_data='#')]]))
