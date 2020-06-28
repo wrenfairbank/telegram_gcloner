@@ -78,6 +78,7 @@ def chosen_folder(update, context):
         }
         context.user_data[udkey_folders] = new_fav_folders
         context.user_data[udkey_fav_folders_replace] = None
+        context.dispatcher.update_persistence()
         set_folders(update, context)
     else:
         query.answer(text='最多只能{}个'.format(max_folders), show_alert=True)
@@ -124,7 +125,7 @@ def choose_folder(update, context):
             context.user_data[udkey_folders_cache] = copy.deepcopy(folders)
 
     if query:
-        logger.debug(str(query.data))
+        logger.debug('{}: {}'.format(update.effective_user.id, query.data))
         if query.from_user.id != query.message.chat_id:
             alert_users(context, update.effective_user, 'invalid caller', query.data)
             query.answer(text='哟呵', show_alert=True)
@@ -249,8 +250,6 @@ def set_folders(update, context):
         inline_keyboard_drive_ids.insert(0, [InlineKeyboardButton('新增一个收藏文件夹', callback_data=callback_query_prefix)])
     inline_keyboard_drive_ids.append([InlineKeyboardButton('完成', callback_data='cancel')])
 
-    for item in inline_keyboard_drive_ids:
-        logger.debug(str(item[0].text) + str(item[0].callback_data))
     context.bot.edit_message_text(chat_id=update.effective_chat.id,
                                   message_id=message_id,
                                   text='共{}/{}收藏文件夹：'.format(

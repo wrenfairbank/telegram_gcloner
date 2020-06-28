@@ -38,6 +38,7 @@ def vip(update: Update, context: CallbackContext):
     else:
         update.message.reply_text('已存在于VIP。')
         return
+    context.dispatcher.update_persistence()
     update.message.reply_text('已添加至VIP。')
     return
 
@@ -52,6 +53,7 @@ def unvip(update: Update, context: CallbackContext):
         new_vip = copy.deepcopy(context.bot_data['vip'])
         new_vip.remove(user_id)
         context.bot_data['vip'] = new_vip
+        context.dispatcher.update_persistence()
         update.message.reply_text('已移出在VIP。')
         return
     else:

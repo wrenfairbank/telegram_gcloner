@@ -5,6 +5,7 @@ import re
 
 from telegram.ext import Dispatcher, CallbackQueryHandler
 
+from utils.fire_save_files import thread_pool
 from utils.helper import alert_users
 from utils.restricted import restricted
 
@@ -25,10 +26,10 @@ def stop_task(update, context):
         match = re.search(regex_stop_task, query.data)
         if match:
             thread_id = int(match.group(1))
-            tasks = context.user_data.get('tasks', None)
+            tasks = thread_pool.get(update.effective_user.id, None)
             if tasks:
                 for t in tasks:
-                    if t.native_id == thread_id:
+                    if t.ident == thread_id and t.owner == query.from_user.id:
                         t.kill()
                         return
     alert_users(context, update.effective_user, 'invalid query data', query.data)

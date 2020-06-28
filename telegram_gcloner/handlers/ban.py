@@ -7,6 +7,7 @@ from telegram import Update
 from telegram.ext import Dispatcher, CommandHandler, CallbackContext, Filters
 
 from utils.config_loader import config
+from utils.fire_save_files import thread_pool
 from utils.restricted import restricted_admin
 
 logger = logging.getLogger(__name__)
@@ -38,10 +39,12 @@ def ban(update: Update, context: CallbackContext):
     else:
         update.message.reply_text('已存在于黑名单。')
         return
-    tasks = context.dispatcher.user_data[user_id].get('tasks', None)
+    context.dispatcher.update_persistence()
+    tasks = thread_pool.get(user_id, None)
     if tasks:
         for t in tasks:
             t.kill()
+            return
     update.message.reply_text('已添加至黑名单。')
     return
 
@@ -56,6 +59,7 @@ def unban(update: Update, context: CallbackContext):
         new_ban = copy.deepcopy(context.bot_data['ban'])
         new_ban.remove(user_id)
         context.bot_data['ban'] = new_ban
+        context.dispatcher.update_persistence()
         update.message.reply_text('已移出在黑名单。')
         return
     else:

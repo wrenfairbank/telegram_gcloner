@@ -125,7 +125,7 @@ def init_logger():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     console_logger = logging.StreamHandler()
-    console_logger.setLevel(logging.DEBUG)
+    console_logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     console_logger.setFormatter(formatter)
     root_logger.addHandler(console_logger)
@@ -201,13 +201,15 @@ def error(update, context):
     # but only one where you have an empty payload by now: A poll (buuuh)
     if update.poll:
         payload += f' with the poll id {update.poll.id}.'
+
+    context_error = str(context.error)
     # lets put this in a "well" formatted text
-    text = f"Hey.\n The error <code>{html.escape(str(context.error))}</code> happened{str(payload)}. " \
+    text = f"Hey.\n The error <code>{html.escape(context_error)}</code> happened{str(payload)}. " \
            f"The full traceback:\n\n<code>{html.escape(str(trace))}" \
            f"</code>"
 
     # ignore message is not modified error from telegram
-    if 'Message is not modified' in context.error:
+    if 'Message is not modified' in context_error:
         raise
 
     # and send it to the dev(s)

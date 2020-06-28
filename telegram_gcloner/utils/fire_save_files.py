@@ -16,15 +16,20 @@ from utils.google_drive import GoogleDrive
 logger = logging.getLogger(__name__)
 
 
+thread_pool = {}
+
+
 class MySaveFileThread(threading.Thread):
     def __init__(self, args=(), kwargs=None):
         threading.Thread.__init__(self, args=(), kwargs=None)
         self.daemon = True
         self.args = args
         self.critical_fault = False
+        self.owner = -1
 
     def run(self):
         update, context, folder_ids, text, dest_folder = self.args
+        self.owner = update.effective_user.id
         thread_id = self.ident
         is_multiple_ids = len(folder_ids) > 1
         chat_id = update.effective_user.id
@@ -225,11 +230,11 @@ class MySaveFileThread(threading.Thread):
         update.callback_query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton(text='已完成', callback_data='cancel')]]))
 
-        tasks = context.user_data.get('tasks', None)
+        tasks = thread_pool.get(update.effective_user.id, None)
         if tasks:
             for t in tasks:
                 if t.ident == thread_id:
-                    context.user_data['tasks'].remove(t)
+                    tasks.remove(t)
                     return
 
     def kill(self):

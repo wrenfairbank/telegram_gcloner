@@ -22,12 +22,12 @@ $ git clone https://github.com/wrenfairbank/telegram_gcloner
 ```
 通过requirements.txt安装依赖
 ```
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 复制`config.ini.example`并更名为`config.ini`
 修改对应的内容，包括：
 
-> path_to_gclone = gclone路径
+> path_to_gclone = gclone.exe路径
 >
 > telegram_token = telegram机器人token
 >

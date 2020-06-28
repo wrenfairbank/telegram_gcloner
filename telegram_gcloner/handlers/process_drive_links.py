@@ -7,7 +7,7 @@ import re
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Dispatcher, CallbackQueryHandler
 
-from utils.fire_save_files import MySaveFileThread
+from utils.fire_save_files import MySaveFileThread, thread_pool
 from utils.google_drive import GoogleDrive
 from utils.helper import parse_folder_id_from_url, alert_users, get_inline_keyboard_pagination_data, simplified_path
 
@@ -151,10 +151,10 @@ def save_to_folder(update, context):
         return
     dest_folder = fav_folders[match.group(1)]
     dest_folder['folder_id'] = match.group(1)
-    if not context.user_data.get('tasks', None):
-        context.user_data['tasks'] = []
+    if not thread_pool.get(update.effective_user.id, None):
+        thread_pool[update.effective_user.id] = []
     t = MySaveFileThread(args=(update, context, folder_ids, text, dest_folder))
-    context.user_data['tasks'].append(t)
+    thread_pool[update.effective_user.id].append(t)
     t.start()
     query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
         [[InlineKeyboardButton(text='已执行', callback_data='#')]]))
