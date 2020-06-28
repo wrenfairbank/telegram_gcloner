@@ -32,15 +32,19 @@ class MySaveFileThread(threading.Thread):
         self.owner = update.effective_user.id
         thread_id = self.ident
         is_multiple_ids = len(folder_ids) > 1
-        chat_id = update.effective_user.id
-        gd = GoogleDrive(chat_id)
+        chat_id = update.effective_chat.id
+        user_id = update.effective_user.id
+        gd = GoogleDrive(user_id)
         message = '目标目录：{}\n\n'.format(dest_folder['path'])
         inline_keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text=f'停止', callback_data=f'stop_task,{thread_id}')]])
 
+        reply_message_id = update.callback_query.message.reply_to_message.message_id \
+            if update.callback_query.message.reply_to_message else None
         rsp = context.bot.send_message(chat_id=chat_id, text=message,
                                        parse_mode=ParseMode.HTML,
                                        disable_web_page_preview=True,
+                                       reply_to_message_id=reply_message_id,
                                        reply_markup=inline_keyboard)
         rsp.done.wait(timeout=60)
         message_id = rsp.result().message_id
@@ -230,7 +234,7 @@ class MySaveFileThread(threading.Thread):
         update.callback_query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton(text='已完成', callback_data='cancel')]]))
 
-        tasks = thread_pool.get(update.effective_user.id, None)
+        tasks = thread_pool.get(user_id, None)
         if tasks:
             for t in tasks:
                 if t.ident == thread_id:

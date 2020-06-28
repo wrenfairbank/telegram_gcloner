@@ -8,7 +8,6 @@ from telegram.ext import Dispatcher, MessageHandler, Filters
 from telegram.utils.helpers import mention_html
 
 from utils.config_loader import config
-from utils.restricted import restricted
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,6 @@ def init(dispatcher: Dispatcher):
     dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, add_group))
 
 
-@restricted
 def add_group(update, context):
     message = 'joined: {} {}'.format(mention_html(update.message.new_chat_members[0].id,
                                                   html.escape(update.message.new_chat_members[0].full_name)),

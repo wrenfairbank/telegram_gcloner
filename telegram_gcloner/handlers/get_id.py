@@ -4,6 +4,7 @@ import logging
 
 from telegram.ext import Dispatcher, CommandHandler
 
+from utils.callback import callback_delete_message
 from utils.config_loader import config
 from utils.restricted import restricted
 
@@ -17,7 +18,13 @@ def init(dispatcher: Dispatcher):
 
 @restricted
 def get_id(update, context):
-    if len(config.USER_IDS) and (update.message.chat.id not in config.USER_IDS):
-        return
-    update.message.reply_text(update.message.chat.id)
-    logger.info('telegram user {0} has requested its id.'.format(update.message.chat.id))
+    logger.info('telegram user {0} has requested its id.'.format(update.effective_user.id))
+    rsp = update.message.reply_text(update.effective_user.id)
+    rsp.done.wait(timeout=60)
+    message_id = rsp.result().message_id
+
+    if update.message.chat_id < 0:
+        context.job_queue.run_once(callback_delete_message, config.TIMER_TO_DELETE_MESSAGE,
+                                   context=(update.message.chat_id, message_id))
+        context.job_queue.run_once(callback_delete_message, config.TIMER_TO_DELETE_MESSAGE,
+                                   context=(update.message.chat_id, update.message.message_id))

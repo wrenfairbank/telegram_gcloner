@@ -20,6 +20,7 @@ class _Config:
         self._user_ids = ''
         self._group_ids = ''
         self._base_path = os.path.dirname(os.path.dirname(__file__))
+        self.TIMER_TO_DELETE_MESSAGE = 10
 
     def load_config(self):
         logger.debug('Loading config')

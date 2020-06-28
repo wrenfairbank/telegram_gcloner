@@ -7,8 +7,9 @@ from telegram import ParseMode
 from telegram.ext import Dispatcher, CommandHandler
 from telegram.utils.helpers import mention_html
 
+from utils.callback import callback_delete_message
 from utils.config_loader import config
-from utils.restricted import restricted
+from utils.restricted import restricted_private
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def init(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler('4999baoyue', contact, pass_args=True))
 
 
-@restricted
+@restricted_private
 def contact(update, context):
     if update.message.text.strip('/4999baoyue'):
         context.bot.send_message(chat_id=config.USER_IDS[0],
@@ -29,8 +30,22 @@ def contact(update, context):
         context.bot.forward_message(chat_id=config.USER_IDS[0],
                                     from_chat_id=update.message.chat_id,
                                     message_id=update.message.message_id)
-        update.message.reply_text('收到。')
+        rsp = update.message.reply_text('收到。')
+        rsp.done.wait(timeout=60)
+        message_id = rsp.result().message_id
+        if update.message.chat_id < 0:
+            context.job_queue.run_once(callback_delete_message, config.TIMER_TO_DELETE_MESSAGE,
+                                       context=(update.message.chat_id, message_id))
+            context.job_queue.run_once(callback_delete_message, config.TIMER_TO_DELETE_MESSAGE,
+                                       context=(update.message.chat_id, update.message.message_id))
     else:
-        update.message.reply_text('这么害羞，不说点啥？\n' +
-                                  config.AD_STRING.format(context.bot.username),
-                                  ParseMode.HTML)
+        rsp = update.message.reply_text('这么害羞，不说点啥？\n' +
+                                        config.AD_STRING.format(context.bot.username),
+                                        ParseMode.HTML)
+        rsp.done.wait(timeout=60)
+        message_id = rsp.result().message_id
+        if update.message.chat_id < 0:
+            context.job_queue.run_once(callback_delete_message, config.TIMER_TO_DELETE_MESSAGE,
+                                       context=(update.message.chat_id, message_id))
+            context.job_queue.run_once(callback_delete_message, config.TIMER_TO_DELETE_MESSAGE,
+                                       context=(update.message.chat_id, update.message.message_id))

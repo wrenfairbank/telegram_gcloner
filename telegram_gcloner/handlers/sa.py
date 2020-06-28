@@ -12,20 +12,20 @@ from zipfile import ZipFile
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 
 from utils.config_loader import config
-from utils.restricted import restricted
+from utils.restricted import restricted_private
 
 logger = logging.getLogger(__name__)
 
 
 def init(dispatcher: Dispatcher):
     """Provide handlers initialization."""
-    dispatcher.add_handler(CommandHandler('sa', get_sa))
-    dispatcher.add_handler(MessageHandler(Filters.document, get_sa))
+    dispatcher.add_handler(CommandHandler('sa', get_sa, filters=~Filters.update.edited_message))
+    dispatcher.add_handler(MessageHandler(Filters.private & Filters.document, get_sa))
 
 
-@restricted
+@restricted_private
 def get_sa(update, context):
-    instruction_text = '请上传含有SA文件的ZIP文件，并在telegram标题写上/sa。\n' \
+    instruction_text = '请私聊上传含有SA文件的ZIP文件，并在telegram标题写上/sa。\n' \
                        '手机用户请先上传ZIP文件，再以/sa回复该信息。'
     if update.message and update.message.caption and update.message.caption.startswith('/sa'):
         document = update.message.document

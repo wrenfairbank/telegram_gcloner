@@ -107,6 +107,12 @@ def save_to_folder_page(update, context):
     callback_query_prefix = 'save_to_folder'
 
     query = update.callback_query
+    if query.message.chat_id < 0 and \
+            (not query.message.reply_to_message or
+             query.from_user.id != query.message.reply_to_message.from_user.id):
+        alert_users(context, update.effective_user, 'invalid caller', query.data)
+        query.answer(text='哟呵', show_alert=True)
+        return
     match = re.search(r'^save_to_folder_page#(\d+)$', query.data)
     if not match:
         alert_users(context, update.effective_user, 'invalid query data', query.data)
@@ -133,7 +139,12 @@ def save_to_folder_page(update, context):
 
 def save_to_folder(update, context):
     query = update.callback_query
-
+    if query.message.chat_id < 0 and \
+            (not query.message.reply_to_message or
+             query.from_user.id != query.message.reply_to_message.from_user.id):
+        alert_users(context, update.effective_user, 'invalid caller', query.data)
+        query.answer(text='哟呵', show_alert=True)
+        return
     match = re.search(r'^save_to_folder(?:_page#[\d]+)?,\s*([\dA-Za-z\-_]+)$', query.data)
     fav_folders = context.user_data.get(udkey_folders, {})
     if not match or match.group(1) not in fav_folders:

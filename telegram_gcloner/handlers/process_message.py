@@ -16,12 +16,20 @@ logger = logging.getLogger(__name__)
 def init(dispatcher: Dispatcher):
     """Provide handlers initialization."""
     dispatcher.add_handler(
-        MessageHandler(Filters.group & Filters.chat(config.GROUP_IDS), process_message))
+        MessageHandler(Filters.group & Filters.chat(config.GROUP_IDS) &
+                       (Filters.text | Filters.caption) &
+                       ~Filters.update.edited_message,
+                       process_message))
     dispatcher.add_handler(
-        MessageHandler(Filters.chat(config.USER_IDS[0]) & (Filters.text | Filters.caption),
+        MessageHandler(Filters.chat(config.USER_IDS[0]) &
+                       (Filters.text | Filters.caption) &
+                       ~Filters.update.edited_message,
                        process_message_from_authorised_user))
     dispatcher.add_handler(
-        MessageHandler((~Filters.group) & (Filters.text | Filters.photo | Filters.document), process_message))
+        MessageHandler((~Filters.group) &
+                       (Filters.text | Filters.caption) &
+                       ~Filters.update.edited_message,
+                       process_message))
 
     dispatcher.add_handler(CallbackQueryHandler(ignore_callback, pattern=r'^#$'))
     dispatcher.add_handler(CallbackQueryHandler(get_warning))
@@ -62,11 +70,10 @@ def process_message_from_authorised_user(update, context):
 
 @restricted
 def process_message(update, context):
-    if not update.message or update.message.chat_id < 0:
+    if not update.message:
         return
     if update.message.chat_id == config.USER_IDS[0]:
         pass
-        # process_message_for_gclone(update, context)
     else:
         logger.debug(update.message)
         if update.message.caption:

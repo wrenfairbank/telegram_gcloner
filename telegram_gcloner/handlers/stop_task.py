@@ -22,6 +22,12 @@ def init(dispatcher: Dispatcher):
 @restricted
 def stop_task(update, context):
     query = update.callback_query
+    if query.message.chat_id < 0 and \
+            (not query.message.reply_to_message or
+             query.from_user.id != query.message.reply_to_message.from_user.id):
+        alert_users(context, update.effective_user, 'invalid caller', query.data)
+        query.answer(text='哟呵', show_alert=True)
+        return
     if query.data:
         match = re.search(regex_stop_task, query.data)
         if match:

@@ -35,7 +35,15 @@ def init(dispatcher: Dispatcher):
                                                 pattern=r'^(?:un)?set_folders(:?_page#\d+)?(?:\,[\dA-Za-z\-_]+)?$'))
 
 
+@restricted
 def chosen_folder(update, context):
+    query = update.callback_query
+    if query.message.chat_id < 0 and \
+            (not query.message.reply_to_message or
+             query.from_user.id != query.message.reply_to_message.from_user.id):
+        alert_users(context, update.effective_user, 'invalid caller', query.data)
+        query.answer(text='哟呵', show_alert=True)
+        return
     if update.effective_user.id in config.USER_IDS or update.effective_user.id in context.bot_data['vip']:
         max_folders = default_max_folders_vip
     else:
@@ -126,7 +134,9 @@ def choose_folder(update, context):
 
     if query:
         logger.debug('{}: {}'.format(update.effective_user.id, query.data))
-        if query.from_user.id != query.message.chat_id:
+        if query.message.chat_id < 0 and \
+                (not query.message.reply_to_message or
+                 query.from_user.id != query.message.reply_to_message.from_user.id):
             alert_users(context, update.effective_user, 'invalid caller', query.data)
             query.answer(text='哟呵', show_alert=True)
             return
@@ -229,6 +239,12 @@ def set_folders(update, context):
         rsp.done.wait(timeout=60)
         message_id = rsp.result().message_id
     else:
+        if query.message.chat_id < 0 and \
+                (not query.message.reply_to_message or
+                 query.from_user.id != query.message.reply_to_message.from_user.id):
+            alert_users(context, update.effective_user, 'invalid caller', query.data)
+            query.answer(text='哟呵', show_alert=True)
+            return
         message_id = query.message.message_id
     folder_ids = context.user_data.get(udkey_folders, None)
 
