@@ -8,7 +8,7 @@
 
 ### 准备工作
 
-1. 安装 [Python 3.6+](https://www.python.org/downloads/)
+1. 安装 [Python 3.7+（推荐最新版3.8）](https://www.python.org/downloads/)
 2. 下载 [gclone](https://github.com/donwa/gclone/releases)
 3. 自行熟悉gclone，并获得包含Service Accounts身份信息的json
 4. 申请一个[Telegram Bot](https://core.telegram.org/bots#6-botfather)，并取得 **token**
@@ -27,11 +27,13 @@ $ pip3 install -r requirements.txt
 复制`config.ini.example`并更名为`config.ini`
 修改对应的内容，包括：
 
-> path_to_gclone = gclone.exe路径
+> path_to_gclone = gclone.exe路径（Linux各发行版如通过安装的方式获取，可不填。Win如已加入path亦可不填）
 >
 > telegram_token = telegram机器人token
 >
-> user_ids = 你的telegram id
+> user_ids = 你的telegram id（多个以英文逗号隔开，第一个ID为管理员）
+
+如有兴趣可调整`./utils/restricted.py`里的权限，默认为只回应`user_ids`里的用户
 
 ## 运行
 
