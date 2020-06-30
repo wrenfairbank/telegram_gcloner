@@ -117,7 +117,9 @@ def main():
     updater.dispatcher.add_error_handler(error)
 
     load_handlers(updater.dispatcher)
+
     updater.start_polling()
+    updater.bot.send_message(chat_id=config.USER_IDS[0], text='Telegram gcloner 初号机，启动')
     updater.idle()
 
 

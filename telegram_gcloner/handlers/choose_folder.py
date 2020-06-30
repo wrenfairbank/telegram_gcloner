@@ -44,7 +44,8 @@ def chosen_folder(update, context):
         alert_users(context, update.effective_user, 'invalid caller', query.data)
         query.answer(text='哟呵', show_alert=True)
         return
-    if update.effective_user.id in config.USER_IDS or update.effective_user.id in context.bot_data['vip']:
+    if update.effective_user.id in config.USER_IDS\
+            or (context.bot_data.get('vip', None) and update.effective_user.id in context.bot_data['vip']):
         max_folders = default_max_folders_vip
     else:
         max_folders = default_max_folders
@@ -224,7 +225,8 @@ def choose_folder(update, context):
 
 @restricted
 def set_folders(update, context):
-    if update.effective_user.id in config.USER_IDS or update.effective_user.id in context.bot_data['vip']:
+    if update.effective_user.id in config.USER_IDS\
+            or (context.bot_data.get('vip', None) and update.effective_user.id in context.bot_data['vip']):
         max_folders = default_max_folders_vip
     else:
         max_folders = default_max_folders
