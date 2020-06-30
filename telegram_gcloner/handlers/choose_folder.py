@@ -128,7 +128,6 @@ def choose_folder(update, context):
         rsp.done.wait(timeout=60)
         message_id = rsp.result().message_id
         if not folders:
-            # folders = context.user_data.get(udkey_fav_drives, None)
             folders = gd.get_drives()
             context.user_data[udkey_folders_cache] = copy.deepcopy(folders)
 
@@ -168,7 +167,6 @@ def choose_folder(update, context):
             if not folders and match.group('page'):
                 folders = context.user_data.get(udkey_folders_cache, None)
             if not folders:
-                # folders = context.user_data.get(udkey_fav_drives, None)
                 folders = gd.get_drives()
                 context.user_data[udkey_folders_cache] = copy.deepcopy(folders)
             if not folders:

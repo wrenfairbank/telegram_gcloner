@@ -49,7 +49,7 @@ def parse_entity_for_drive_id(message):
             continue
         folder_ids[folder_id] = name
 
-        logger.info('Found {0} with folder_id {1}.'.format(name, folder_id))
+        logger.debug('Found {0} with folder_id {1}.'.format(name, folder_id))
 
     if len(folder_ids) == 0:
         logger.debug('Cannot find any legit folder id.')
@@ -167,5 +167,6 @@ def save_to_folder(update, context):
     t = MySaveFileThread(args=(update, context, folder_ids, text, dest_folder))
     thread_pool[update.effective_user.id].append(t)
     t.start()
+    logger.debug('User {} has added task {}.'.format(query.from_user.id, t.ident))
     query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
         [[InlineKeyboardButton(text='已执行', callback_data='#')]]))

@@ -115,7 +115,7 @@ class MySaveFileThread(threading.Thread):
                     break
                 output = line.rstrip()
                 if output:
-                    logger.debug(output)
+                    # logger.debug(output)
                     match_total_files = re.search(regex_total_files, output)
                     if match_total_files:
                         progress_transferred_file = int(match_total_files.group(1))
@@ -163,10 +163,14 @@ class MySaveFileThread(threading.Thread):
                         message_progress = '{}\n<code>写入权限错误，请确认权限</code>'.format(message_progress)
                         temp_message = '{}{}'.format(message, message_progress)
                         # logger.info('写入权限错误，请确认权限'.format())
-                        context.bot.edit_message_text(chat_id=chat_id, message_id=message_id,
-                                                      text=temp_message, parse_mode=ParseMode.HTML,
-                                                      disable_web_page_preview=True,
-                                                      reply_markup=inline_keyboard)
+                        try:
+                            context.bot.edit_message_text(chat_id=chat_id, message_id=message_id,
+                                                          text=temp_message, parse_mode=ParseMode.HTML,
+                                                          disable_web_page_preview=True,
+                                                          reply_markup=inline_keyboard)
+                        except Exception as e:
+                            logger.debug('Error {} occurs when editing message {} for user {} in chat {}: \n{}'.format(
+                                e, message_id, user_id, chat_id, temp_message))
                         process.terminate()
                         self.critical_fault = True
                         break
@@ -176,10 +180,14 @@ class MySaveFileThread(threading.Thread):
                         message_progress = '{}\n<code>读取权限错误，请确认权限</code>'.format(message_progress)
                         temp_message = '{}{}'.format(message, message_progress)
                         # logger.info('读取权限错误，请确认权限：')
-                        context.bot.edit_message_text(chat_id=chat_id, message_id=message_id,
-                                                      text=temp_message, parse_mode=ParseMode.HTML,
-                                                      disable_web_page_preview=True,
-                                                      reply_markup=inline_keyboard)
+                        try:
+                            context.bot.edit_message_text(chat_id=chat_id, message_id=message_id,
+                                                          text=temp_message, parse_mode=ParseMode.HTML,
+                                                          disable_web_page_preview=True,
+                                                          reply_markup=inline_keyboard)
+                        except Exception as e:
+                            logger.debug('Error {} occurs when editing message {} for user {} in chat {}: \n{}'.format(
+                                e, message_id, user_id, chat_id, temp_message))
                         process.terminate()
                         self.critical_fault = True
                         break
@@ -187,10 +195,15 @@ class MySaveFileThread(threading.Thread):
                     if message_progress != message_progress_last:
                         if datetime.datetime.now() - progress_update_time > datetime.timedelta(seconds=5):
                             temp_message = '{}{}'.format(message, message_progress)
-                            context.bot.edit_message_text(chat_id=chat_id, message_id=message_id,
-                                                          text=temp_message, parse_mode=ParseMode.HTML,
-                                                          disable_web_page_preview=True,
-                                                          reply_markup=inline_keyboard)
+                            try:
+                                context.bot.edit_message_text(chat_id=chat_id, message_id=message_id,
+                                                              text=temp_message, parse_mode=ParseMode.HTML,
+                                                              disable_web_page_preview=True,
+                                                              reply_markup=inline_keyboard)
+                            except Exception as e:
+                                logger.debug(
+                                    'Error {} occurs when editing message {} for user {} in chat {}: \n{}'.format(
+                                        e, message_id, user_id, chat_id, temp_message))
                             message_progress_last = message_progress
                             progress_update_time = datetime.datetime.now()
 
@@ -207,7 +220,7 @@ class MySaveFileThread(threading.Thread):
                 if link:
                     link_text = '👉<a href="{}">Link</a>'.format(link)
             except Exception as e:
-                logger.info(e)
+                logger.info(str(e))
 
             if self.critical_fault is True:
                 message = '{}{}❌\n{}\n{}\n\n'.format(message, message_progress_heading, message_progress_content,
@@ -221,19 +234,28 @@ class MySaveFileThread(threading.Thread):
                                                       message_progress_content,
                                                       link_text)
 
-            context.bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message,
-                                          parse_mode=ParseMode.HTML, disable_web_page_preview=True,
-                                          reply_markup=inline_keyboard)
+            try:
+                context.bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message,
+                                              parse_mode=ParseMode.HTML, disable_web_page_preview=True,
+                                              reply_markup=inline_keyboard)
+            except Exception as e:
+                logger.debug('Error {} occurs when editing message {} for user {} in chat {}: \n{}'.format(
+                    e, message_id, user_id, chat_id, message))
+
             if self.critical_fault is True:
                 break
 
-        message_append = 'Finished.'
-        message += message_append
-        context.bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message,
-                                      parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+        message += 'Finished.'
+        try:
+            context.bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message,
+                                          parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+        except Exception as e:
+            logger.debug('Error {} occurs when editing message {} for user {} in chat {}: \n{}'.format(
+                e, message_id, user_id, chat_id, message))
         update.callback_query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton(text='已完成', callback_data='cancel')]]))
 
+        logger.debug('User {} has finished task {}: \n{}'.format(user_id, thread_id, message))
         tasks = thread_pool.get(user_id, None)
         if tasks:
             for t in tasks:

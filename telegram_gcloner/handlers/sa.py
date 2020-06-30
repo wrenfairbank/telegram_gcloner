@@ -107,3 +107,4 @@ def get_sa(update, context):
         config_file.write(file_to_write)
 
     update.message.reply_text('共收到{}个SA文件，已配置。'.format(json_count))
+    logger.info('{} service account files have been saved for {}.'.format(json_count, update.effective_user.id))

@@ -210,7 +210,7 @@ def error(update, context):
 
     # ignore message is not modified error from telegram
     if 'Message is not modified' in context_error:
-        raise
+        return
 
     # and send it to the dev(s)
     for dev_id in devs:

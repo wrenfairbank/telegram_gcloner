@@ -21,7 +21,8 @@ def init(dispatcher: Dispatcher):
 
 @restricted_private
 def contact(update, context):
-    if update.message.text.strip('/4999baoyue'):
+    text = update.message.text.strip('/4999baoyue')
+    if text:
         context.bot.send_message(chat_id=config.USER_IDS[0],
                                  text='Received message from {} ({}):'.format(
                                      mention_html(update.effective_user.id, html.escape(update.effective_user.name)),
@@ -30,6 +31,7 @@ def contact(update, context):
         context.bot.forward_message(chat_id=config.USER_IDS[0],
                                     from_chat_id=update.message.chat_id,
                                     message_id=update.message.message_id)
+        logger.info('{} ({}) left a message: {}'.format(update.effective_user.name, update.effective_user.id, text))
         rsp = update.message.reply_text('收到。')
         rsp.done.wait(timeout=60)
         message_id = rsp.result().message_id

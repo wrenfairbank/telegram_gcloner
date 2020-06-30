@@ -44,8 +44,10 @@ def ban(update: Update, context: CallbackContext):
     if tasks:
         for t in tasks:
             t.kill()
-            return
+            logger.debug('Task {} was stopped due to user {} is banned.'.format(t.ident, user_id))
+            break
     update.message.reply_text('已添加至黑名单。')
+    logger.info('{} is banned.'.format(user_id))
     return
 
 
@@ -61,6 +63,7 @@ def unban(update: Update, context: CallbackContext):
         context.bot_data['ban'] = new_ban
         context.dispatcher.update_persistence()
         update.message.reply_text('已移出在黑名单。')
+        logger.info('{} is unbanned.'.format(user_id))
         return
     else:
         update.message.reply_text('该用户不在黑名单。')
