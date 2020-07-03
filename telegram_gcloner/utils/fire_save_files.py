@@ -32,6 +32,7 @@ class MySaveFileThread(threading.Thread):
         self.owner = update.effective_user.id
         thread_id = self.ident
         is_multiple_ids = len(folder_ids) > 1
+        is_fclone = 'fclone' in os.path.basename(config.PATH_TO_GCLONE)
         chat_id = update.effective_chat.id
         user_id = update.effective_user.id
         gd = GoogleDrive(user_id)
@@ -59,12 +60,23 @@ class MySaveFileThread(threading.Thread):
                 '-P',
                 '--stats',
                 '1s',
-                '--transfers',
-                '6',
-                '--tpslimit',
-                '6',
                 '--ignore-existing'
             ]
+            if is_fclone is True:
+                command_line += [
+                    '--checkers=256',
+                    '--transfers=256',
+                    '--drive-pacer-min-sleep=1ms',
+                    '--drive-pacer-burst=5000',
+                    '--check-first'
+                ]
+            else:
+                command_line += [
+                    '--transfers',
+                    '6',
+                    '--tpslimit',
+                    '6',
+                ]
             gclone_config = os.path.join(config.BASE_PATH,
                                          'gclone_config',
                                          str(update.effective_user.id),
@@ -93,10 +105,11 @@ class MySaveFileThread(threading.Thread):
             progress_transferred_size = '0'
             progress_total_size = '0 Bytes'
             progress_speed = '-'
+            progress_speed_file = '-'
             progress_eta = '-'
             progress_size_percentage_10 = 0
             regex_checked_files = r'Checks:\s+(\d+)\s+/\s+(\d+)'
-            regex_total_files = r'Transferred:\s+(\d+) / (\d+), (\d+)%'
+            regex_total_files = r'Transferred:\s+(\d+) / (\d+), (\d+)%,\s*([\d.]+\sFiles/s)?'
             regex_total_size = r'Transferred:[\s]+([\d.]+\s*[kMGTP]?) / ([\d.]+[\s]?[kMGTP]?Bytes),' \
                                r'\s*(?:\-|(\d+)\%),\s*([\d.]+\s*[kMGTP]?Bytes/s),\s*ETA\s*([\-0-9hmsdwy]+)'
             message_progress_last = ''
@@ -106,7 +119,7 @@ class MySaveFileThread(threading.Thread):
                 try:
                     line = process.stdout.readline()
                 except Exception as e:
-                    logger.debug(str(e))
+                    # logger.debug(str(e))
                     if process.poll() is not None:
                         break
                     else:
@@ -115,13 +128,15 @@ class MySaveFileThread(threading.Thread):
                     break
                 output = line.rstrip()
                 if output:
-                    # logger.debug(output)
+                    logger.debug(output)
                     match_total_files = re.search(regex_total_files, output)
                     if match_total_files:
                         progress_transferred_file = int(match_total_files.group(1))
                         progress_total_files = int(match_total_files.group(2))
                         progress_file_percentage = int(match_total_files.group(3))
                         progress_file_percentage_10 = progress_file_percentage // 10
+                        if match_total_files.group(4):
+                            progress_speed_file = match_total_files.group(4)
                     match_total_size = re.search(regex_total_size, output)
                     if match_total_size:
                         progress_transferred_size = match_total_size.group(1)
@@ -139,8 +154,8 @@ class MySaveFileThread(threading.Thread):
                     message_progress = '<a href="https://drive.google.com/open?id={}">{}</a>\n' \
                                        '检查文件： <code>{} / {}</code>\n' \
                                        '文件数量： <code>{} / {}</code>\n' \
-                                       '任务容量：<code>{} / {}</code>\n' \
-                                       '传输速度：<code>{} ETA {}</code>\n' \
+                                       '任务容量：<code>{} / {}</code>\n{}' \
+                                       '复制速度：<code>{} ETA {}</code>\n' \
                                        '任务进度：<code>[{}] {: >4}%</code>' \
                         .format(
                         folder_id,
@@ -151,6 +166,7 @@ class MySaveFileThread(threading.Thread):
                         progress_total_files,
                         progress_transferred_size,
                         progress_total_size,
+                        f'任务速度：<code>{progress_speed_file}</code>\n' if is_fclone is True else '',
                         progress_speed,
                         progress_eta,
                         '█' * progress_file_percentage_10 + '░' * (
