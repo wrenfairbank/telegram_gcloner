@@ -62,7 +62,9 @@ class MySaveFileThread(threading.Thread):
                 '1s',
                 '--ignore-existing'
             ]
-            if is_fclone is True:
+            if config.GCLONE_PARA_OVERRIDE:
+                command_line.extend(config.GCLONE_PARA_OVERRIDE)
+            elif is_fclone is True:
                 command_line += [
                     '--checkers=256',
                     '--transfers=256',
@@ -73,7 +75,7 @@ class MySaveFileThread(threading.Thread):
             else:
                 command_line += [
                     '--transfers',
-                    '6',
+                    '8',
                     '--tpslimit',
                     '6',
                 ]
@@ -119,7 +121,7 @@ class MySaveFileThread(threading.Thread):
                 try:
                     line = process.stdout.readline()
                 except Exception as e:
-                    # logger.debug(str(e))
+                    logger.debug(str(e))
                     if process.poll() is not None:
                         break
                     else:
@@ -128,7 +130,7 @@ class MySaveFileThread(threading.Thread):
                     break
                 output = line.rstrip()
                 if output:
-                    logger.debug(output)
+                    # logger.debug(output)
                     match_total_files = re.search(regex_total_files, output)
                     if match_total_files:
                         progress_transferred_file = int(match_total_files.group(1))

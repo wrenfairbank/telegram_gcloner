@@ -16,11 +16,13 @@ logger = logging.getLogger(__name__)
 def parse_folder_id_from_url(url):
     folder_id = None
 
-    pattern = r'https://drive\.google\.com/drive/(?:u/[\d]+/)?folders/([\w.\-_]+)(?:\?[\=\w]+)?' \
-              r'|https\:\/\/drive\.google\.com\/folderview\?id=([\w.\-_]+)(?:\&[=\w]+)?' \
-              r'|https\:\/\/drive\.google\.com\/open\?id=([\w.\-_]+)(?:\&[=\w]+)?' \
-              r'|https\:\/\/drive\.google\.com\/(?:a\/[\w.\-_]+\/)?file\/d\/([\w\.\-_]+)\/' \
-              r'|https\:\/\/drive\.google\.com\/(?:a\/[\w.\-_]+\/)?uc\?id\=([\w.\-_]+)&?'
+    pattern = r'https://drive\.google\.com/(?:' \
+              r'drive/(?:u/[\d]+/)?(?:mobile/)?folders/([\w.\-_]+)(?:\?[\=\w]+)?|' \
+              r'folderview\?id=([\w.\-_]+)(?:\&[=\w]+)?|' \
+              r'open\?id=([\w.\-_]+)(?:\&[=\w]+)?|' \
+              r'(?:a/[\w.\-_]+/)?file/d/([\w.\-_]+)|' \
+              r'(?:a/[\w.\-_]+/)?uc\?id\=([\w.\-_]+)&?' \
+              r')'
 
     x = re.search(pattern, url)
     if x:

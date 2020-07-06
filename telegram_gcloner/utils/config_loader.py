@@ -19,8 +19,10 @@ class _Config:
         self._path_to_gclone = None
         self._user_ids = ''
         self._group_ids = ''
+        self._gclone_para_override = ''
         self._base_path = os.path.dirname(os.path.dirname(__file__))
         self.TIMER_TO_DELETE_MESSAGE = 10
+        self.AD_STRING = '再了个见，请<a href="{}">私聊本机器人</a>。'
 
     def load_config(self):
         logger.debug('Loading config')
@@ -44,11 +46,10 @@ class _Config:
             'telegram_token',
             'user_ids',
             'group_ids',
-            'ad_string',
         ]
 
         self.get_config_from_section('str', config_general_keywords_str, config_general)
-        self.get_config_from_section('str', ['path_to_gclone'], config_general, optional=True)
+        self.get_config_from_section('str', ['path_to_gclone', 'gclone_para_override'], config_general, optional=True)
 
         self._user_ids = [int(item) for item in self._user_ids.split(',')]
         self._group_ids = [int(item) for item in self._group_ids.split(',')]
@@ -66,6 +67,9 @@ class _Config:
             input("Press Enter to continue...")
             sys.exit(0)
         logger.info('Found token: ' + self._telegram_token)
+
+        if self._gclone_para_override:
+            self._gclone_para_override = self._gclone_para_override.split()
 
     def get_config_from_section(self, var_type, keywords, section, optional=False):
         for item in keywords:
@@ -97,12 +101,12 @@ class _Config:
         return self._user_ids
 
     @property
-    def AD_STRING(self):
-        return self._ad_string
-
-    @property
     def GROUP_IDS(self):
         return self._group_ids
+
+    @property
+    def GCLONE_PARA_OVERRIDE(self):
+        return self._gclone_para_override
 
     @property
     def BASE_PATH(self):

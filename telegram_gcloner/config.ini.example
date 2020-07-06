@@ -5,4 +5,4 @@ telegram_token =
 user_ids = -1
 group_ids = -1
 
-ad_string = 再了个见，请<a href="{}">私聊本机器人</a>。
+gclone_para_override =
