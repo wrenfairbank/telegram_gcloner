@@ -33,6 +33,8 @@ $ pip3 install -r requirements.txt
 > telegram_token = telegram机器人token
 >
 > user_ids = 你的telegram id（多个以英文逗号隔开，第一个ID为管理员）
+>
+> gclone_para_override = 如果你不知道这个是什么就留空
 
 如有兴趣可调整`./utils/restricted.py`里的权限，默认为只回应`user_ids`里的用户
 
@@ -43,7 +45,6 @@ $ pip3 install -r requirements.txt
    - 手机用户可先上传ZIP文件，再回复该信息`/sa`。
 3. 向机器人发送`/folders`设定常用文件夹。
 4. 向机器人发送或转发带有Google Drive链接的信息，按提示操作。
-
 
 ## License
 
