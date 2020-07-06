@@ -111,7 +111,7 @@ class MySaveFileThread(threading.Thread):
             progress_eta = '-'
             progress_size_percentage_10 = 0
             regex_checked_files = r'Checks:\s+(\d+)\s+/\s+(\d+)'
-            regex_total_files = r'Transferred:\s+(\d+) / (\d+), (\d+)%,\s*([\d.]+\sFiles/s)?'
+            regex_total_files = r'Transferred:\s+(\d+) / (\d+), (\d+)%(?:,\s*([\d.]+\sFiles/s))?'
             regex_total_size = r'Transferred:[\s]+([\d.]+\s*[kMGTP]?) / ([\d.]+[\s]?[kMGTP]?Bytes),' \
                                r'\s*(?:\-|(\d+)\%),\s*([\d.]+\s*[kMGTP]?Bytes/s),\s*ETA\s*([\-0-9hmsdwy]+)'
             message_progress_last = ''
